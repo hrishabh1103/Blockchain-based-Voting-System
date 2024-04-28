@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Voting System</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+    <script>
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                await window.ethereum.enable();
+            } else if (window.web3) {
+                window.web3 = new Web3(window.web3.currentProvider);
+            } else {
+                console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+            }
+
+            const contractAddress = '0xd9145CCE52D386f254917e481eB44e9943F39138'; // Replace with your contract address
+            const contractABI = [ /* ABI of your contract */ ];
+            const votingContract = new web3.eth.Contract(contractABI, contractAddress);
+
+            document.getElementById('voteButton').addEventListener('click', async () => {
+                const candidate = parseInt(document.getElementById('candidate').value);
+                const accounts = await web3.eth.getAccounts();
+                await votingContract.methods.vote(candidate).send({ from: accounts[0] });
+                alert('Vote submitted successfully!');
+            });
+
+            document.getElementById('getResultButton').addEventListener('click', async () => {
+                const candidate = parseInt(document.getElementById('candidate').value);
+                const result = await votingContract.methods.getVoteCount(candidate).call();
+                alert(`Candidate ${candidate} received ${result} votes.`);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Blockchain Voting System</h1>
+    <label for="candidate">Candidate Number:</label>
+    <input type="number" id="candidate" min="1" max="10" required>
+    <button id="voteButton">Vote</button>
+    <button id="getResultButton">Get Result</button>
+</body>
+</html>
